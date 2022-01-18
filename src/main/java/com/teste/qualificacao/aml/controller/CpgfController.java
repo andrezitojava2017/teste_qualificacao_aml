@@ -4,21 +4,18 @@ import com.teste.qualificacao.aml.model.CpgfModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/")
@@ -34,6 +31,13 @@ public class CpgfController {
     }
 
 
+    @GetMapping("/questao")
+    public ResponseEntity<String> questao() {
+        questaoM();
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+
     @GetMapping("/sum")
     public ResponseEntity<String> getTotalSum() {
         List<String> listCpgfModel = getListCpgfModel();
@@ -44,7 +48,7 @@ public class CpgfController {
     }
 
     @GetMapping("/sum/confidential")
-    public ResponseEntity getSumConfidentialInformation(){
+    public ResponseEntity getSumConfidentialInformation() {
         List<String> listCpgfModel = getListCpgfModel();
         List<CpgfModel> listCpgf = getListCpgf(listCpgfModel);
         double result = getSumConfidentialInfomation(listCpgf);
@@ -61,11 +65,12 @@ public class CpgfController {
         return sumV;
     }
 
-    private double getSumConfidentialInfomation(List<CpgfModel> data){
+    private double getSumConfidentialInfomation(List<CpgfModel> data) {
 
         double sigiloso = data.stream()
                 .filter(ln -> ln.getNome_portador().equalsIgnoreCase("Sigiloso"))
-                .mapToDouble(v -> v.getValor_transacao()).sum();
+                .mapToDouble(v -> v.getValor_transacao())
+                .sum();
 
         return sigiloso;
     }
@@ -178,5 +183,48 @@ public class CpgfController {
         }
         return dataTransacao;
     }
+
+    private void questaoM() {
+
+        List<String> listCpgfModel = getListCpgfModel();
+        List<CpgfModel> listCpgf = getListCpgf(listCpgfModel);
+
+        List<Integer> codOrgao = listCpgf.stream()
+                .map(cp -> cp.getCod_orgao())
+                .distinct()
+                .collect(Collectors.toList());
+/*
+        List<CpgfModel> sigiloso = listCpgf.stream()
+                .filter(ln -> ln.getNome_portador().equalsIgnoreCase("sigiloso"))
+                .collect(Collectors.toList());
+*/
+
+        listCpgf.stream()
+                .filter(ln -> ln.getNome_portador().equalsIgnoreCase("sigiloso"))
+                .collect(Collectors.toList());
+
+/*
+      Map<Integer, Double> mapa = new HashMap<>();
+        for (Integer integer : codOrgao) {
+            double sum = sigiloso.stream()
+                    .filter(sg -> sg.getCod_orgao() == integer)
+                    .mapToDouble(value -> value.getValor_transacao())
+                    .sum();
+            mapa.put(integer, sum);
+        }
+
+
+
+        mapa.forEach((integer, aDouble) -> {
+
+            if(aDouble != 0.0){
+
+            }
+        });
+        */
+
+
+    }
+
 
 }
