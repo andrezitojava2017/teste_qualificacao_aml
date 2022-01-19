@@ -34,7 +34,7 @@ public class CpgfController {
 
     }
 
-    @GetMapping("/sum")
+    @GetMapping("/questao/k")
     public ResponseEntity<String> getTotalSum() {
         List<String> listCpgfModel = service.getLinesFileCPGF();
         List<CpgfModel> listCpgf = service.getListCpgf(listCpgfModel);
@@ -43,7 +43,7 @@ public class CpgfController {
         return new ResponseEntity("Resposta questao 'K': R$" + aDouble, HttpStatus.OK);
     }
 
-    @GetMapping("/sum/confidential")
+    @GetMapping("/questao/l")
     public ResponseEntity getSumConfidentialInformation() {
         List<String> listCpgfModel = service.getLinesFileCPGF();
         List<CpgfModel> listCpgf = service.getListCpgf(listCpgfModel);
