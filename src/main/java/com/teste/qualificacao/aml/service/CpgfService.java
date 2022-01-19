@@ -1,6 +1,10 @@
 package com.teste.qualificacao.aml.service;
 
 import com.teste.qualificacao.aml.model.CpgfModel;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.block.factory.HashingStrategies;
+import org.eclipse.collections.impl.utility.ListIterate;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -12,14 +16,14 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class CpgfService {
 
 
     public Double sumValues(List<CpgfModel> data) {
 
         double sumV = data.stream().mapToDouble(CpgfModel::getValor_transacao).sum();
-        System.out.println(sumV);
-
+        //System.out.println(sumV);
         return sumV;
     }
 
@@ -143,7 +147,8 @@ public class CpgfService {
     }
 
     /**
-     * Recuperamos a soma dos gastoso sigilosos e qual o orgão que manteve mais movimentações
+     * Recuperamos a soma dos gastos sigilosos e qual o orgão que manteve mais movimentações
+     *
      * @return
      */
     public Map.Entry<Integer, Double> questaoM() {
@@ -179,6 +184,38 @@ public class CpgfService {
                 .max(mapa.entrySet(), Comparator.comparingDouble(Map.Entry::getValue));
 
 
+        return max;
+
+    }
+
+    public Map.Entry<CpgfModel, Double> questaoN() {
+        List<String> listCpgfModel = getLinesFileCPGF();
+        List<CpgfModel> listCpgf = getListCpgf(listCpgfModel);
+
+        List<CpgfModel> portador = listCpgf.stream()
+                .filter(d -> !d.getNome_portador().equalsIgnoreCase("sigiloso"))
+                .collect(Collectors.toList());
+
+        MutableList<CpgfModel> distinct = ListIterate
+                .distinct(portador, HashingStrategies.fromFunction(CpgfModel::getNome_portador));
+
+
+        Map<CpgfModel, Double> mapa = new HashMap<CpgfModel, Double>();
+
+        for (CpgfModel port : distinct) {
+            double sum = portador.stream()
+                    .filter(d -> d.getNome_portador().equalsIgnoreCase(port.getNome_portador()))
+                    .mapToDouble(value -> value.getValor_transacao())
+                    .sum();
+            mapa.put(port, sum );
+        }
+
+        Map.Entry<CpgfModel, Double> max = Collections
+                .max(mapa.entrySet(), Comparator.comparingDouble(Map.Entry::getValue));
+
+      // mapa.forEach((s, aDouble) -> System.out.println(s.getNome_portador() + " - " + s.getNome_orgao() + " " + aDouble));
+
+        //System.out.println(max);
         return max;
 
     }

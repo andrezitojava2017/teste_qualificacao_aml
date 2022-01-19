@@ -59,6 +59,18 @@ public class CpgfController {
     }
 
 
+    @GetMapping("/questao/n")
+    public ResponseEntity getQuetsaoN(){
+        Map.Entry<CpgfModel, Double> result = service.questaoN();
+
+        String portador = result.getKey().getNome_portador();
+        String orgao = result.getKey().getNome_orgao();
+        double soma = result.getValue();
+
+        String rs = portador + " - " + orgao + " = " + soma;
+
+        return new ResponseEntity(rs, HttpStatus.OK);
+    }
 
 
 }
