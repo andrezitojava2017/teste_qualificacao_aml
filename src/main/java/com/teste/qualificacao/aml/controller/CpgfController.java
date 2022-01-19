@@ -67,10 +67,20 @@ public class CpgfController {
         String orgao = result.getKey().getNome_orgao();
         double soma = result.getValue();
 
-        String rs = portador + " - " + orgao + " = " + soma;
+        String rs = "Portador:" + portador + "\nOrgao: " + orgao + "\nSoma total: " + soma;
 
         return new ResponseEntity(rs, HttpStatus.OK);
     }
 
+    @GetMapping("/questao/o")
+    public ResponseEntity questaoO(){
+
+        Map.Entry<String, Long> result = service.questaoO();
+        String nome = result.getKey();
+        String total = result.getValue().toString();
+        String rs = "Favorecido: " + nome + "\nTotal de transações: " + total;
+        return new ResponseEntity(rs, HttpStatus.OK);
+
+    }
 
 }

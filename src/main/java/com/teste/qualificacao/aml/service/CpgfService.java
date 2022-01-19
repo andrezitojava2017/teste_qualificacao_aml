@@ -171,6 +171,7 @@ public class CpgfService {
         Map<Integer, Double> mapa = new HashMap<>();
 
         // soma das transações por codigo do orgao
+
         for (Integer integer : codOrgao) {
             double sum = sigiloso.stream()
                     .filter(sg -> sg.getCod_orgao() == integer) // integer é um list q contem o codigo_orgaos
@@ -188,22 +189,28 @@ public class CpgfService {
 
     }
 
+    /**
+     * Metodo faz calculo de qual PORTADOR fez mais movimentaçoes
+     * @return Map
+     */
     public Map.Entry<CpgfModel, Double> questaoN() {
         List<String> listCpgfModel = getLinesFileCPGF();
         List<CpgfModel> listCpgf = getListCpgf(listCpgfModel);
-
+/*
         List<CpgfModel> portador = listCpgf.stream()
                 .filter(d -> !d.getNome_portador().equalsIgnoreCase("sigiloso"))
                 .collect(Collectors.toList());
 
+ */
+
         MutableList<CpgfModel> distinct = ListIterate
-                .distinct(portador, HashingStrategies.fromFunction(CpgfModel::getNome_portador));
+                .distinct(listCpgf, HashingStrategies.fromFunction(CpgfModel::getNome_portador));
 
 
         Map<CpgfModel, Double> mapa = new HashMap<CpgfModel, Double>();
 
         for (CpgfModel port : distinct) {
-            double sum = portador.stream()
+            double sum = listCpgf.stream()
                     .filter(d -> d.getNome_portador().equalsIgnoreCase(port.getNome_portador()))
                     .mapToDouble(value -> value.getValor_transacao())
                     .sum();
@@ -213,11 +220,34 @@ public class CpgfService {
         Map.Entry<CpgfModel, Double> max = Collections
                 .max(mapa.entrySet(), Comparator.comparingDouble(Map.Entry::getValue));
 
-      // mapa.forEach((s, aDouble) -> System.out.println(s.getNome_portador() + " - " + s.getNome_orgao() + " " + aDouble));
+       //mapa.forEach((s, aDouble) -> System.out.println(s.getNome_portador() + " - " + s.getNome_orgao() + " " + aDouble));
 
         //System.out.println(max);
         return max;
+    }
 
+
+    public Map.Entry<String, Long> questaoO(){
+
+        List<String> listCpgfModel = getLinesFileCPGF();
+        List<CpgfModel> listCpgf = getListCpgf(listCpgfModel);
+
+        MutableList<CpgfModel> distinct = ListIterate
+                .distinct(listCpgf, HashingStrategies.fromFunction(CpgfModel::getNome_portador));
+
+        Map<String, Long> mapa = new HashMap<>();
+
+        for (CpgfModel dist : distinct) {
+            long count = listCpgf.stream()
+                    .filter(ls -> ls.getNome_favorecido().equalsIgnoreCase(dist.getNome_favorecido()))
+                    .count();
+            mapa.put(dist.getNome_favorecido(), count);
+        }
+
+        //mapa.forEach((s, aLong) -> System.out.println(s + " " + aLong));
+        Map.Entry<String, Long> max = Collections
+                .max(mapa.entrySet(), Comparator.comparingDouble(Map.Entry::getValue));
+        return max;
     }
 
 }
